@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>Nexus AI Limited Edition V23.0</title>
+  <title>Nexus AI Cloud Limited Edition V24.0</title>
   <style>
     body { display: flex; flex-direction: column; height: 100vh; margin: 0; font-family: "Microsoft YaHei", sans-serif; background-color: #fdf6e3; }
 
@@ -179,7 +179,7 @@
     currentChatId = Date.now().toString();
     messages = [];
     chat.innerHTML = "";
-    messages.push({ role: "system", content: "你是一款叫做Nexus的AI，你的回复必须专业，复杂，详细，但不能脱离实际。你的回答要尽量人性化，让人理解，情感富裕，互动要多，话题要新颖，让人可以接上。要多样化，专业化的回复。" });
+    messages.push({ role: "system", content: "你是一款叫做Nexus的AI，你的回复必须专业，复杂，详细，但不能脱离实际。你的回答要尽量人性化，让人理解，情感富裕，互动要多，话题要新颖，让人可以接上。要多样化，专业化的回复。回复中的代码要用markdown代码块输出。" });
     saveChat();
     updateChatList();
   };
@@ -218,7 +218,10 @@
     try {
       const response = await fetch(NVIDIA_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+      headers: {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer g4f_u_mlz51t_f46b195f8e5c4dc42d9abfbf8e28ff1a6eeb1dcd842f24d2_02e48ad9"
+},
         body: JSON.stringify({
           model: model,
           messages: messages,

@@ -1,368 +1,468 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>Nexus AI Cloud Limited Edition V24.0</title>
-  <style>
-    body { display: flex; flex-direction: column; height: 100vh; margin: 0; font-family: "Microsoft YaHei", sans-serif; background-color: #fdf6e3; }
-
-    #top-bar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      background: #f5deb3;
-      border-bottom: 1px solid #ccc;
-    }
-
-    #chat { flex: 1; padding: 10px; overflow-y: auto; border-bottom: 1px solid #ccc; scroll-behavior: smooth; }
-
-    #input-area { display: flex; padding: 10px; background: #f5deb3; align-items: center; }
-
-    #prompt { flex: 1; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; }
-
-    #run, #newChat, #deleteChat, #renameChat, #clearAll {
-      margin-left: 10px;
-      padding: 8px 16px;
-      background-color: #ffe4b5;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-    #run:hover, #newChat:hover, #deleteChat:hover, #renameChat:hover, #clearAll:hover {
-      background-color: #ffdead;
-    }
-    button:active { transform: scale(0.95); }
-
-    #chatList, #modelSelect {
-      margin-left: 10px;
-      padding: 8px 16px;
-      background-color: #ffe4b5;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    #chatList:hover, #modelSelect:hover {
-      background-color: #ffdead;
-    }
-
-    .message { 
-      margin: 5px 0; padding: 8px; border-radius: 10px; 
-      max-width: 70%; word-wrap: break-word; white-space: pre-wrap;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    .user { background: #fff8dc; align-self: flex-end; }
-    .ai { background: #faf0e6; align-self: flex-start; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .loading-spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #ff8c00;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      margin: 10px;
-      opacity: 1;
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .loading-spinner.fade-out {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨承浩睿</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffcce6 0%, #c9e6ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #ff99cc;
+        }
+        
+        /* 扭蛋机装饰 */
+        .gacha-machine {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .gacha-top {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 100px;
+            background: #ff6699;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gacha-glass {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 300px;
+            border: 10px solid #ff99cc;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 标题样式 */
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ff6699;
+            font-size: 2.8rem;
+            text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 班级选择器 */
+        .class-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .class-btn {
+            padding: 12px 20px;
+            background: #a6e3ff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #5a89b3;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .class-btn.active {
+            background: #ff9dd8;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .class-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 名字显示区域 */
+        .name-display {
+            background: rgba(255, 255, 255, 0.7);
+            height: 220px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 5px dashed #ff99cc;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .name {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .name.rolling {
+            animation: rolling 0.5s infinite;
+        }
+        
+        .name.selected {
+            font-size: 4.5rem;
+            color: #ff3366;
+            text-shadow: 3px 3px 0 #ffdae9, 5px 5px 0 rgba(0, 0, 0, 0.1);
+            animation: pulse 1s infinite;
+        }
+        
+        /* 速度控制 */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .speed-label {
+            font-size: 1.2rem;
+            color: #5a89b3;
+            font-weight: bold;
+        }
+        
+        .speed-slider {
+            width: 300px;
+            -webkit-appearance: none;
+            height: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #a6e3ff, #ff9dd8);
+            outline: none;
+        }
+        
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ff6699;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 按钮样式 */
+        .button-container {
+            text-align: center;
+        }
+        
+        .start-btn {
+            padding: 18px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #ff9dd8, #a6e3ff);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.25);
+        }
+        
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 纸屑效果容器 */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+        }
+        
+        /* 动画 */
+        @keyframes rolling {
+            0% { transform: translateY(30px); opacity: 0.5; }
+            100% { transform: translateY(-30px); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .name {
+                font-size: 2.5rem;
+            }
+            
+            .name.selected {
+                font-size: 3rem;
+            }
+            
+            .speed-slider {
+                width: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="top-bar">
-    <select id="chatList"></select>
-  </div>
+    <div class="container">
+        <div class="gacha-machine">
+            <div class="gacha-top"></div>
+            <div class="gacha-glass"></div>
+        </div>
+        
+        <h1 class="title">今天的幸运儿就是</h1>
+        
+        <div class="class-selector">
+            <button class="class-btn active" data-class="class2501">2501班</button>
+            <button class="class-btn" data-class="class2505">2505班</button>
+            <button class="class-btn" data-class="class2507">2507班</button>
+        </div>
+        
+        <div class="name-display">
+            <div class="name">准备开始</div>
+            <canvas id="confetti-canvas"></canvas>
+        </div>
+        
+        <div class="speed-control">
+            <span class="speed-label">速度:</span>
+            <input type="range" min="50" max="500" value="200" class="speed-slider" id="speed-slider">
+        </div>
+        
+        <div class="button-container">
+            <button class="start-btn" id="start-btn">开始点名</button>
+        </div>
+    </div>
 
-  <div id="chat"></div>
+    <script>
+        // 学生名单数据
+        const classStudents = {
+            class2501: [
+                "谢安昕", "黄麒", "谢嘉妍", "李施邈", "黄钰淇", "韦朝睿", "刘宇翔", "韦紫鑫",
+                "赖睿杰", "梁黄宸", "古曜珲", "黄周矗", "郭宇暄", "唐圣哲", "鲁思诗", "陆宸冉",
+                "吴羽墨", "欧邓琳", "周子乔", "韦凌煊", "韦昕吾", "邓杰仁", "隆承琪", "覃葉文",
+                "毛浩吉", "梁潇月", "杨博臣", "李秋融", "何金泽", "零景程", "莫理斯", "吴万霖",
+                "贺若恬", "夏梓洛", "刘洛涵", "韦思涵", "韦子彤", "谢宗洋", "冒林靖坤", "覃云霄",
+                "陈嘉栋", "李格熙", "韦雨辰", "余宏洋", "谭骁洪", "欧阳铭灿", "谭佳榜", "吴宇喆",
+                "韦博今", "赵振凯", "黎栩嘉", "许济麟", "邱麒羽", "蒙艺桐", "樊珍西", "李欣宸"
+            ],
+            class2505: [
+                "冯钰城", "韦姿燕", "黄雨晗", "罗梓萌", "蒋钦吉", "唐昌懋", "曾钰佳", "汤佳言",
+                "贺品捷", "唐子沐", "魏浩辰", "陈龙", "符瑞涵", "陈俊烨", "罗雪睿", "许耀文",
+                "廖紫含", "龚俊源", "黄昱乔", "马毅翔", "钟璋保", "李昊廷", "黄景赫", "卢思静",
+                "韦志晖", "罗睿祺", "阮涪婧", "韦若汐", "何晨睿", "谭皓龙", "吴彤恩", "梁书菡",
+                "赖彤彤", "盘宗李想", "吴晨玮", "叶明慧", "韦霁桐", "杨明杰", "方梓羽", "李桓宇",
+                "邹依宸", "张在钦", "张景森", "周雨婷", "谢金辰", "马翊宸", "吴钰彤", "孙瑜君",
+                "邹忠懋", "莫蕙宁", "王子曦", "韦智源", "李铭皓", "刘钰蕾", "陈弈帆", "覃炫哲"
+            ],
+            class2507: [
+                "何姗悦", "潘懿阳", "马靖宇", "甘宇杰", "徐子轩", "叶睿童", "麦玮哲", "曾楚彬",
+                "杨承浩睿", "农智丞", "冯莉芸", "黄梓翔", "吕志远", "陈子柯", "林奕辰", "唐暄婷",
+                "袁宏涛", "邓佩妮", "刘校成", "蔡卓恩", "郭俊逸", "池天泽", "黄桂瑜", "崔宸蔚",
+                "陈佳泽", "王智悦", "彭可欣", "杨惠淇", "杨佳因", "杨珺童", "陈熙昆", "罗誉腾",
+                "张文岳", "曾梁可禹", "吴凌龙", "顾语辰", "周钰哲", "谭子义", "杨玥灵", "陈梓彤",
+                "蒙欣颖", "卿文泓", "覃韦嘉", "许灿", "刘思睿", "莫潇同", "黄星语", "沈子涵",
+                "黄钰珂", "曾泓钢", "黄鉁沅", "吴羽曦", "蒙南曲", "裴奕晗", "李盛航"
+            ]
+        };
 
-  <div id="input-area">
-    <input type="text" id="prompt" placeholder="Message Nexus" />
-    <button id="run">发送</button>
-    <button id="newChat">新对话</button>
-    <select id="modelSelect">
-      <option value="openai/gpt-oss-20b">Nexus-Fast</option>
-      <option value="qwen/qwen3-next-80b-a3b-thinking">Nexus-Thinking</option>
-      <option value="deepseek-ai/deepseek-v3.1-terminus">Nexus-Terminus</option>
-    </select>
-    <button id="renameChat">重命名对话</button>
-    <button id="deleteChat">删除对话</button>
-    <button id="clearAll">清空所有对话</button>
-  </div>
-
-<!-- MathJax -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<!-- highlight.js + marked.js -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
-<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<script>
-  marked.setOptions({
-    highlight: function(code, lang) {
-      const validLang = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language: validLang }).value;
-    }
-  });
-
-  const NVIDIA_URL = "https://g4f.space/api/nvidia/chat/completions";
-  const chat = document.getElementById("chat");
-  const chatList = document.getElementById("chatList");
-  let messages = [];
-  let currentChatId = null;
-
-  function addMessage(text, role, isMarkdown = false) {
-    const div = document.createElement("div");
-    div.className = "message " + role;
-    div.innerHTML = isMarkdown ? marked.parse(text) : text;
-    chat.appendChild(div);
-    chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
-    return div;
-  }
-
-  function saveChat() {
-    if (!currentChatId) return;
-    let allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    if (!allChats[currentChatId]) {
-      allChats[currentChatId] = { name: "对话 " + currentChatId, messages: [] };
-    }
-    allChats[currentChatId].messages = messages;
-    localStorage.setItem("allChats", JSON.stringify(allChats));
-    updateChatList();
-  }
-
-  function loadChat(chatId) {
-    const allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    if (allChats[chatId]) {
-      messages = [];
-      chat.innerHTML = "";
-      allChats[chatId].messages.forEach(msg => {
-        if (msg.role === "system") return;
-        const isMarkdown = msg.role === "assistant";
-        addMessage(msg.content, msg.role === "user" ? "user" : "ai", isMarkdown);
-        messages.push(msg);
-      });
-      currentChatId = chatId;
-      chatList.value = chatId;
-      updateChatList();
-    }
-  }
-
-  function updateChatList() {
-    const allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    chatList.innerHTML = "";
-    Object.keys(allChats).forEach(id => {
-      const option = document.createElement("option");
-      option.value = id;
-      option.textContent = allChats[id].name || ("对话 " + id);
-      chatList.appendChild(option);
-    });
-    if (currentChatId) chatList.value = currentChatId;
-  }
-
-  document.getElementById("newChat").onclick = () => {
-    currentChatId = Date.now().toString();
-    messages = [];
-    chat.innerHTML = "";
-    messages.push({ role: "system", content: "你是一款叫做Nexus的AI，你的回复必须专业，复杂，详细，但不能脱离实际。你的回答要尽量人性化，让人理解，情感富裕，互动要多，话题要新颖，让人可以接上。要多样化，专业化的回复。回复中的代码要用markdown代码块输出。" });
-    saveChat();
-    updateChatList();
-  };
-
-  chatList.onchange = () => { loadChat(chatList.value); };
-
-  document.getElementById("deleteChat").onclick = () => {
-    let allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    if (currentChatId && allChats[currentChatId]) {
-      delete allChats[currentChatId];
-      localStorage.setItem("allChats", JSON.stringify(allChats));
-      chat.innerHTML = "";
-      messages = [];
-      currentChatId = null;
-      updateChatList();
-      const ids = Object.keys(allChats);
-      if (ids.length > 0) loadChat(ids[ids.length - 1]);
-      else document.getElementById("newChat").click();
-    }
-  };
-
-  document.getElementById("renameChat").onclick = () => {
-    let allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    if (currentChatId && allChats[currentChatId]) {
-      const newName = prompt("请输入新的对话名称：", allChats[currentChatId].name);
-      if (newName) {
-        allChats[currentChatId].name = newName;
-        localStorage.setItem("allChats", JSON.stringify(allChats));
-        updateChatList();
-      }
-    }
-  };
-
-  async function callG4FStream(messages, onDelta, onFinish, onError) {
-    const model = document.getElementById("modelSelect").value;
-    try {
-      const response = await fetch(NVIDIA_URL, {
-        method: "POST",
-      headers: {
-  "Content-Type": "application/json",
-  "Authorization": "Bearer g4f_u_mlz51t_f46b195f8e5c4dc42d9abfbf8e28ff1a6eeb1dcd842f24d2_02e48ad9"
-},
-        body: JSON.stringify({
-          model: model,
-          messages: messages,
-          max_tokens: 128000,
-          temperature: 0.7,
-          stream: true,
-          web_search: true
-        })
-      });
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          if (!line.startsWith("data:")) continue;
-          const content = line.slice(5).trim();
-
-          if (content === "[DONE]") {
-            onFinish();
-            return;
-          }
-
-          try {
-            const data = JSON.parse(content);
-            const delta = data.choices[0].delta?.content;
-            if (delta) onDelta(delta);
-          } catch {
-            continue;
-          }
+        // 初始化变量
+        let currentClass = 'class2501';
+        let isRolling = false;
+        let rollInterval;
+        let rollSpeed = 200; // 默认速度
+        let currentIndex = 0;
+        
+        // DOM元素
+        const nameElement = document.querySelector('.name');
+        const startButton = document.getElementById('start-btn');
+        const speedSlider = document.getElementById('speed-slider');
+        const classButtons = document.querySelectorAll('.class-btn');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        
+        // 设置Canvas尺寸
+        confettiCanvas.width = confettiCanvas.offsetWidth;
+        confettiCanvas.height = confettiCanvas.offsetHeight;
+        
+        // 班级切换
+        classButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                classButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentClass = button.getAttribute('data-class');
+                resetRoller();
+            });
+        });
+        
+        // 速度控制
+        speedSlider.addEventListener('input', function() {
+            rollSpeed = 550 - this.value; // 反转值，使右侧更快
+            
+            if (isRolling) {
+                clearInterval(rollInterval);
+                startRolling();
+            }
+        });
+        
+        // 开始/停止点名
+        startButton.addEventListener('click', function() {
+            if (!isRolling) {
+                startRolling();
+                startButton.textContent = '停止点名';
+                // 隐藏庆祝效果
+                confettiCanvas.style.display = 'none';
+            } else {
+                stopRolling();
+                startButton.textContent = '开始点名';
+                // 显示庆祝效果
+                createConfetti();
+            }
+        });
+        
+        // 开始滚动名字
+        function startRolling() {
+            isRolling = true;
+            nameElement.classList.add('rolling');
+            nameElement.classList.remove('selected');
+            
+            rollInterval = setInterval(() => {
+                currentIndex = Math.floor(Math.random() * classStudents[currentClass].length);
+                nameElement.textContent = classStudents[currentClass][currentIndex];
+                
+                // 随机颜色（马卡龙色系）
+                const macaronColors = ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F8B195', '#F67280'];
+                const randomColor = macaronColors[Math.floor(Math.random() * macaronColors.length)];
+                nameElement.style.color = randomColor;
+                
+            }, rollSpeed);
         }
-      }
-      decoder.decode(new Uint8Array(), { stream: false });
-      onFinish();
-    } catch (err) {
-      console.error("请求失败:", err);
-      onError("网络异常或服务器无响应，请稍后再试。");
-    }
-  }
-
-  document.getElementById("run").onclick = async () => {
-    const userPrompt = document.getElementById("prompt").value.trim();
-    if (!userPrompt) return;
-    addMessage(userPrompt, "user");
-    messages.push({ role: "user", content: userPrompt });
-    saveChat();
-    document.getElementById("prompt").value = "";
-
-    const loadingMsg = addMessage("", "ai");
-    loadingMsg.innerHTML = '<div class="loading-spinner"></div>';
-
-    let fullReply = "";
-    document.getElementById("run").disabled = true;
-
-    await callG4FStream(
-      messages,
-      (delta) => {
-        fullReply += delta;
-        fullReply = fullReply.replace(/’\s/g, "’").replace(/’/g, "'");
-        loadingMsg.innerHTML = marked.parse(fullReply);
-
-        // 实时代码高亮
-        if (window.hljs) {
-          loadingMsg.querySelectorAll("pre code").forEach(block => {
-            hljs.highlightElement(block);
-          });
+        
+        // 停止滚动并选择名字
+        function stopRolling() {
+            isRolling = false;
+            clearInterval(rollInterval);
+            nameElement.classList.remove('rolling');
+            nameElement.classList.add('selected');
+            
+            // 使用更明显的颜色
+            const selectedColors = ['#FF3366', '#FF0066', '#FF0044', '#CC0033', '#FF0055'];
+            nameElement.style.color = selectedColors[Math.floor(Math.random() * selectedColors.length)];
         }
-
-        chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
-      },
-      () => {
-        const spinner = loadingMsg.querySelector(".loading-spinner");
-        if (spinner) {
-          spinner.classList.add("fade-out");
-          setTimeout(() => spinner.remove(), 500);
+        
+        // 重置点名器
+        function resetRoller() {
+            clearInterval(rollInterval);
+            isRolling = false;
+            nameElement.textContent = '准备开始';
+            nameElement.classList.remove('rolling', 'selected');
+            nameElement.style.color = '';
+            startButton.textContent = '开始点名';
+            // 隐藏庆祝效果
+            confettiCanvas.style.display = 'none';
         }
-        messages.push({ role: "assistant", content: fullReply });
-        saveChat();
-
-        // LaTeX 公式统一渲染
-        if (window.MathJax) {
-          MathJax.typesetPromise([loadingMsg]);
+        
+        // 创建庆祝纸屑效果
+        function createConfetti() {
+            confettiCanvas.style.display = 'block';
+            const particles = [];
+            const colors = ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F8B195', '#F67280'];
+            
+            // 清除Canvas
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            
+            // 创建粒子
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height,
+                    radius: Math.random() * 5 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 1,
+                    angle: Math.random() * 360,
+                    rotation: Math.random() * 360
+                });
+            }
+            
+            // 绘制粒子
+            function draw() {
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                
+                particles.forEach(particle => {
+                    confettiCtx.beginPath();
+                    confettiCtx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    confettiCtx.fillStyle = particle.color;
+                    confettiCtx.fill();
+                    
+                    // 更新粒子位置
+                    particle.y += particle.speed;
+                    particle.x += Math.sin(particle.angle) * 0.5;
+                    particle.rotation += 2;
+                    
+                    // 如果粒子超出画布，重置到顶部
+                    if (particle.y > confettiCanvas.height) {
+                        particle.y = 0;
+                        particle.x = Math.random() * confettiCanvas.width;
+                    }
+                });
+                
+                // 逐渐减少动画
+                if (particles[0].y < confettiCanvas.height * 2) {
+                    requestAnimationFrame(draw);
+                } else {
+                    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                    confettiCanvas.style.display = 'none';
+                }
+            }
+            
+            draw();
         }
-
-        document.getElementById("run").disabled = false;
-      },
-      (errorMsg) => {
-        const spinner = loadingMsg.querySelector(".loading-spinner");
-        if (spinner) {
-          spinner.classList.add("fade-out");
-          setTimeout(() => spinner.remove(), 500);
-        }
-        loadingMsg.textContent = errorMsg;
-        document.getElementById("run").disabled = false;
-      }
-    );
-  };
-
-  document.getElementById("clearAll").onclick = () => {
-    localStorage.removeItem("allChats");
-    chat.innerHTML = "";
-    messages = [];
-    currentChatId = null;
-    updateChatList();
-    alert("所有对话已清空！");
-    document.getElementById("newChat").click();
-  };
-
-  // 输入框：Enter 发送，Shift+Enter 换行
-  document.getElementById("prompt").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      document.getElementById("run").click();
-    }
-  });
-
-  window.onload = () => {
-    const allChats = JSON.parse(localStorage.getItem("allChats") || "{}");
-    const ids = Object.keys(allChats);
-    if (ids.length > 0) { 
-      loadChat(ids[ids.length - 1]);
-    } else { 
-      document.getElementById("newChat").click();
-    }
-    updateChatList();
-
-    if (window.hljs) {
-      hljs.highlightAll();
-    }
-    if (window.MathJax) {
-      MathJax.typesetPromise();
-    }
-  };
-</script>
+    </script>
 </body>
 </html>
